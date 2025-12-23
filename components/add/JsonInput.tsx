@@ -2,12 +2,15 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Check, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Check, Eye, EyeOff, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Recipe } from "@/types/recipe";
 import { addRecipe, generateId, validateRecipe } from "@/lib/recipes";
 import { cn } from "@/lib/utils";
+
+const CORRECT_PASSWORD = "pizza-planet";
 
 interface ParsedRecipe {
   data: Recipe | null;
@@ -16,11 +19,24 @@ interface ParsedRecipe {
 
 export function JsonInput() {
   const router = useRouter();
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const [input, setInput] = useState("");
   const [parsed, setParsed] = useState<ParsedRecipe>({ data: null, errors: [] });
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const handlePasswordSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === CORRECT_PASSWORD) {
+      setIsUnlocked(true);
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  }, [password]);
 
   const parseInput = useCallback((value: string) => {
     setInput(value);
@@ -36,7 +52,6 @@ export function JsonInput() {
       const validation = validateRecipe(data);
 
       if (validation.valid) {
-        // Ensure the recipe has an ID
         const recipe = {
           ...data,
           id: data.id || generateId(),
@@ -59,7 +74,6 @@ export function JsonInput() {
       addRecipe(parsed.data);
       setSaved(true);
 
-      // Navigate to the new recipe after a short delay
       setTimeout(() => {
         router.push(`/recipes/${parsed.data!.id}`);
       }, 1000);
@@ -74,6 +88,43 @@ export function JsonInput() {
   }, [parsed.data, router]);
 
   const isValid = parsed.data !== null && parsed.errors.length === 0;
+
+  if (!isUnlocked) {
+    return (
+      <div className="max-w-sm mx-auto">
+        <div className="rounded-lg border border-border bg-card p-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber/10">
+            <Lock className="h-6 w-6 text-amber" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">Password Required</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter the password to add new recipes.
+          </p>
+          <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4">
+            <Input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError(false);
+              }}
+              className={cn(
+                "text-center",
+                passwordError && "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {passwordError && (
+              <p className="text-sm text-destructive">Incorrect password</p>
+            )}
+            <Button type="submit" className="w-full">
+              Unlock
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

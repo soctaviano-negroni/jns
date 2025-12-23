@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cocktail Recipes",
+  title: "Jigger&Stem",
   description: "A curated collection of craft cocktail recipes",
 };
 

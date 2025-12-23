@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: RecipePageProps) {
   }
 
   return {
-    title: `${recipe.name} | Cocktail Recipes`,
+    title: `${recipe.name} | Jigger&Stem`,
     description: `Learn how to make a ${recipe.name}. ${recipe.characteristics?.flavor?.slice(0, 3).join(", ")} cocktail made with ${recipe.baseSpirit}.`,
   };
 }

@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { JsonInput } from "@/components/add/JsonInput";
 
 export const metadata = {
-  title: "Add Recipe | Cocktail Recipes",
+  title: "Add Recipe | Jigger&Stem",
   description: "Add a new cocktail recipe to your collection",
 };
 

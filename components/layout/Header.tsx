@@ -15,7 +15,7 @@ export function Header() {
           href="/"
           className="text-xl font-semibold tracking-tight text-foreground transition-colors duration-200 hover:text-amber"
         >
-          Cocktail Recipes
+          Jigger&Stem
         </Link>
 
         <nav className="flex items-center gap-6">
