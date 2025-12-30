@@ -6,7 +6,32 @@ export interface SearchFilters {
   spirits: string[];
   strength: string | null;
   difficulty: string | null;
+  sortBy: string;
 }
+
+export const SORT_OPTIONS = [
+  { value: "name-asc", label: "Name (A-Z)" },
+  { value: "name-desc", label: "Name (Z-A)" },
+  { value: "difficulty-asc", label: "Difficulty (Easy-Hard)" },
+  { value: "difficulty-desc", label: "Difficulty (Hard-Easy)" },
+  { value: "strength-asc", label: "Strength (Mild-Strong)" },
+  { value: "strength-desc", label: "Strength (Strong-Mild)" },
+] as const;
+
+const DIFFICULTY_ORDER: Record<string, number> = {
+  Beginner: 0,
+  Intermediate: 1,
+  Advanced: 2,
+};
+
+const STRENGTH_ORDER: Record<string, number> = {
+  Mild: 0,
+  "Medium-Low": 1,
+  Medium: 2,
+  "Medium-Strong": 3,
+  Strong: 4,
+  "Very Strong": 5,
+};
 
 const fuseOptions: IFuseOptions<Recipe> = {
   keys: [
@@ -97,17 +122,62 @@ export function filterRecipes(
   });
 }
 
+export function sortRecipes(recipes: Recipe[], sortBy: string): Recipe[] {
+  const sorted = [...recipes];
+
+  switch (sortBy) {
+    case "name-asc":
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "name-desc":
+      sorted.sort((a, b) => b.name.localeCompare(a.name));
+      break;
+    case "difficulty-asc":
+      sorted.sort(
+        (a, b) =>
+          (DIFFICULTY_ORDER[a.characteristics?.difficulty ?? ""] ?? 99) -
+          (DIFFICULTY_ORDER[b.characteristics?.difficulty ?? ""] ?? 99)
+      );
+      break;
+    case "difficulty-desc":
+      sorted.sort(
+        (a, b) =>
+          (DIFFICULTY_ORDER[b.characteristics?.difficulty ?? ""] ?? 99) -
+          (DIFFICULTY_ORDER[a.characteristics?.difficulty ?? ""] ?? 99)
+      );
+      break;
+    case "strength-asc":
+      sorted.sort(
+        (a, b) =>
+          (STRENGTH_ORDER[a.characteristics?.strength ?? ""] ?? 99) -
+          (STRENGTH_ORDER[b.characteristics?.strength ?? ""] ?? 99)
+      );
+      break;
+    case "strength-desc":
+      sorted.sort(
+        (a, b) =>
+          (STRENGTH_ORDER[b.characteristics?.strength ?? ""] ?? 99) -
+          (STRENGTH_ORDER[a.characteristics?.strength ?? ""] ?? 99)
+      );
+      break;
+  }
+
+  return sorted;
+}
+
 export function searchAndFilter(
   context: SearchContext,
   query: string,
   filters: SearchFilters
 ): Recipe[] {
   const searched = searchRecipes(context, query);
-  return filterRecipes(searched, filters);
+  const filtered = filterRecipes(searched, filters);
+  return sortRecipes(filtered, filters.sortBy);
 }
 
 export const emptyFilters: SearchFilters = {
   spirits: [],
   strength: null,
   difficulty: null,
+  sortBy: "name-asc",
 };

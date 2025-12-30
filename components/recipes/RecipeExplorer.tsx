@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Recipe, FilterOptions } from "@/types/recipe";
-import { SearchFilters, createSearchContext, searchAndFilter, emptyFilters } from "@/lib/search";
+import { SearchFilters, createSearchContext, searchAndFilter, emptyFilters, sortRecipes } from "@/lib/search";
+import { getCustomRecipes } from "@/lib/recipes";
 import { SearchBar } from "@/components/search/SearchBar";
 import { FilterPanel } from "@/components/search/FilterPanel";
 import { RecipeGrid } from "./RecipeGrid";
@@ -13,12 +14,23 @@ interface RecipeExplorerProps {
 }
 
 export function RecipeExplorer({ initialRecipes, filterOptions }: RecipeExplorerProps) {
-  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+  const [allRecipes, setAllRecipes] = useState<Recipe[]>(initialRecipes);
+  const [recipes, setRecipes] = useState<Recipe[]>(() => sortRecipes(initialRecipes, "name-asc"));
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<SearchFilters>(emptyFilters);
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  const searchContext = useMemo(() => createSearchContext(initialRecipes), [initialRecipes]);
+  // Load custom recipes from localStorage on mount
+  useEffect(() => {
+    const customRecipes = getCustomRecipes();
+    if (customRecipes.length > 0) {
+      const combined = [...initialRecipes, ...customRecipes];
+      setAllRecipes(combined);
+      setRecipes(sortRecipes(combined, filters.sortBy));
+    }
+  }, [initialRecipes, filters.sortBy]);
+
+  const searchContext = useMemo(() => createSearchContext(allRecipes), [allRecipes]);
 
   // Debounce search query
   useEffect(() => {

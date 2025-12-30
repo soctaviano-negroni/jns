@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { FilterOptions } from "@/types/recipe";
-import { SearchFilters } from "@/lib/search";
+import { SearchFilters, SORT_OPTIONS } from "@/lib/search";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -26,7 +26,12 @@ export function FilterPanel({ filters, options, onChange }: FilterPanelProps) {
       spirits: [],
       strength: null,
       difficulty: null,
+      sortBy: "name-asc",
     });
+  };
+
+  const setSort = (sortBy: string) => {
+    onChange({ ...filters, sortBy });
   };
 
   const toggleSpirit = (spirit: string) => {
@@ -51,7 +56,7 @@ export function FilterPanel({ filters, options, onChange }: FilterPanelProps) {
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 text-sm font-medium text-foreground transition-colors duration-200 hover:text-amber"
         >
-          <span>Filters</span>
+          <span>Filters & Sorting</span>
           <ChevronDown
             className={cn(
               "h-4 w-4 transition-transform duration-200",
@@ -142,6 +147,29 @@ export function FilterPanel({ filters, options, onChange }: FilterPanelProps) {
                   onClick={() => setDifficulty(difficulty)}
                 >
                   {difficulty}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h4 className="mb-2 text-sm font-medium text-foreground">Sort By</h4>
+            <div className="flex flex-wrap gap-2">
+              {SORT_OPTIONS.map((option) => (
+                <Badge
+                  key={option.value}
+                  variant={filters.sortBy === option.value ? "default" : "outline"}
+                  className={cn(
+                    "cursor-pointer transition-colors duration-200",
+                    filters.sortBy === option.value
+                      ? "bg-amber text-charcoal hover:bg-amber/90"
+                      : "hover:bg-secondary"
+                  )}
+                  onClick={() => setSort(option.value)}
+                >
+                  {option.label}
                 </Badge>
               ))}
             </div>

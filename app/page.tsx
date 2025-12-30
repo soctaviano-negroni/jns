@@ -18,7 +18,7 @@ export default function HomePage() {
               Craft Cocktails
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              A curated collection of {recipes.length} cocktail recipes, from classic
+              A curated collection of cocktail recipes, from classic
               standards to contemporary creations.
             </p>
           </div>
