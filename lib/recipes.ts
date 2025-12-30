@@ -1,6 +1,6 @@
 import { Recipe, FilterOptions } from "@/types/recipe";
 import recipesData from "@/data/recipes.json";
-import { spiritToCategory } from "./search";
+import { spiritToCategory } from "./spirit-categories";
 
 const STORAGE_KEY = "custom-recipes";
 
