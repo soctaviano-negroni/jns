@@ -334,7 +334,7 @@
         "Summer"
       ]
     },
-    "baseSpirit": "Rum, Whisky, Cognac",
+    "baseSpirit": "Rum, Whiskey, Cognac",
     "glass": "Nick & Nora",
     "ingredients": [
       {
@@ -350,7 +350,7 @@
       {
         "amount": 0.5,
         "unit": "oz",
-        "name": "Rye Whisky",
+        "name": "Rye Whiskey",
         "substitutions": [
           "Bourbon"
         ],
@@ -1458,7 +1458,7 @@
       {
         "amount": 1.5,
         "unit": "oz",
-        "name": "Scotch Whisky",
+        "name": "Scotch Whiskey",
         "substitutions": [
           "Blended Scotch",
           "Highland Single Malt"
@@ -2895,7 +2895,7 @@
       ],
       "style": [
         "Modern Classic",
-        "Whisky Sour Variation"
+        "Whiskey Sour Variation"
       ],
       "difficulty": "Intermediate",
       "strength": "Medium-Strong",
@@ -4914,7 +4914,7 @@
       {
         "amount": 2,
         "unit": "oz",
-        "name": "Scotch Whisky",
+        "name": "Scotch Whiskey",
         "substitutions": [
           "Blended Scotch",
           "Highland Single Malt"
@@ -7929,13 +7929,13 @@
         "Year-Round"
       ]
     },
-    "baseSpirit": "Rye Whisky",
+    "baseSpirit": "Rye Whiskey",
     "glass": "Coupe",
     "ingredients": [
       {
         "amount": 1.5,
         "unit": "oz",
-        "name": "Rye Whisky",
+        "name": "Rye Whiskey",
         "substitutions": [
           "Bourbon",
           "High-rye Bourbon"

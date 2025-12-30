@@ -7,6 +7,21 @@ export interface SearchFilters {
   difficulty: string | null;
 }
 
+// Spirit category mappings - when filtering by a category, include all variants
+export const spiritCategories: Record<string, string[]> = {
+  Whiskey: ["Whiskey", "Bourbon", "Rye", "Scotch", "Rye Whiskey"],
+  Tequila: ["Tequila", "Mezcal"],
+};
+
+// Reverse mapping: variant -> category (for display grouping)
+export const spiritToCategory: Record<string, string> = {
+  Bourbon: "Whiskey",
+  Rye: "Whiskey",
+  Scotch: "Whiskey",
+  "Rye Whiskey": "Whiskey",
+  Mezcal: "Tequila",
+};
+
 const fuseOptions: IFuseOptions<Recipe> = {
   keys: [
     { name: "name", weight: 2 },
@@ -45,6 +60,16 @@ export function searchRecipes(
   return results.map((result) => result.item);
 }
 
+// Parse comma-separated baseSpirit into individual spirits
+function parseBaseSpirits(baseSpirit: string): string[] {
+  return baseSpirit.split(",").map((s) => s.trim());
+}
+
+// Expand a selected spirit filter to include all variants in its category
+function getExpandedSpirits(selectedSpirit: string): string[] {
+  return spiritCategories[selectedSpirit] || [selectedSpirit];
+}
+
 export function filterRecipes(
   recipes: Recipe[],
   filters: SearchFilters
@@ -52,8 +77,18 @@ export function filterRecipes(
   return recipes.filter((recipe) => {
     // Filter by spirits (OR within spirits)
     if (filters.spirits.length > 0) {
-      const hasMatchingSpirit = filters.spirits.some((spirit) =>
-        recipe.baseSpirit.toLowerCase().includes(spirit.toLowerCase())
+      // Parse the recipe's baseSpirit (handles comma-separated values)
+      const recipeSpirits = parseBaseSpirits(recipe.baseSpirit);
+
+      // Expand each selected filter to include category variants
+      const expandedFilterSpirits = filters.spirits.flatMap(getExpandedSpirits);
+
+      // Check if any recipe spirit matches any expanded filter spirit
+      const hasMatchingSpirit = recipeSpirits.some((recipeSpirit) =>
+        expandedFilterSpirits.some(
+          (filterSpirit) =>
+            recipeSpirit.toLowerCase() === filterSpirit.toLowerCase()
+        )
       );
       if (!hasMatchingSpirit) return false;
     }

@@ -1,5 +1,6 @@
 import { Recipe, FilterOptions } from "@/types/recipe";
 import recipesData from "@/data/recipes.json";
+import { spiritToCategory } from "./search";
 
 const STORAGE_KEY = "custom-recipes";
 
@@ -65,7 +66,13 @@ export function getFilterOptions(): FilterOptions {
 
   recipes.forEach((recipe) => {
     if (recipe.baseSpirit) {
-      spirits.add(recipe.baseSpirit);
+      // Parse comma-separated base spirits
+      const individualSpirits = recipe.baseSpirit.split(",").map((s) => s.trim());
+      individualSpirits.forEach((spirit) => {
+        // Map variant spirits to their category (e.g., Bourbon -> Whiskey)
+        const category = spiritToCategory[spirit] || spirit;
+        spirits.add(category);
+      });
     }
     if (recipe.characteristics?.strength) {
       strengths.add(recipe.characteristics.strength);
