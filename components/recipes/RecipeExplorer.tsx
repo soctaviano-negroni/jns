@@ -1,12 +1,35 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Recipe, FilterOptions } from "@/types/recipe";
 import { SearchFilters, createSearchContext, searchAndFilter, emptyFilters, sortRecipes } from "@/lib/search";
 import { getCustomRecipes } from "@/lib/recipes";
 import { SearchBar } from "@/components/search/SearchBar";
 import { FilterPanel } from "@/components/search/FilterPanel";
 import { RecipeGrid } from "./RecipeGrid";
+
+const STORAGE_KEY = "recipe-explorer-state";
+
+interface SavedState {
+  filters: SearchFilters;
+  searchQuery: string;
+  scrollY: number;
+}
+
+function saveState(state: SavedState) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
+function loadState(): SavedState | null {
+  try {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
 
 interface RecipeExplorerProps {
   initialRecipes: Recipe[];
@@ -19,6 +42,61 @@ export function RecipeExplorer({ initialRecipes, filterOptions }: RecipeExplorer
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<SearchFilters>(emptyFilters);
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const isRestoringState = useRef(false);
+  const hasRestoredState = useRef(false);
+
+  // Restore state from sessionStorage on mount
+  useEffect(() => {
+    if (hasRestoredState.current) return;
+    hasRestoredState.current = true;
+
+    const saved = loadState();
+    if (saved) {
+      isRestoringState.current = true;
+      setFilters(saved.filters);
+      setSearchQuery(saved.searchQuery);
+      setDebouncedQuery(saved.searchQuery);
+
+      // Restore scroll position after recipes render
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, saved.scrollY);
+          isRestoringState.current = false;
+        });
+      });
+    }
+  }, []);
+
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveState({
+        filters,
+        searchQuery,
+        scrollY: window.scrollY,
+      });
+    };
+
+    // Save on any click (captures navigation)
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a")) {
+        saveState({
+          filters,
+          searchQuery,
+          scrollY: window.scrollY,
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("click", handleClick, true);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("click", handleClick, true);
+    };
+  }, [filters, searchQuery]);
 
   // Load custom recipes from localStorage on mount
   useEffect(() => {

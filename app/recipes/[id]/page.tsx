@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowLeft, Wine, Droplets, Flame, BookOpen } from "lucide-react";
+import { Wine, Droplets, Flame, BookOpen } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/badge";
@@ -51,13 +51,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          <Link
-            href="/"
-            className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to recipes
-          </Link>
+          <BackButton />
 
           <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
             {/* Image Section */}
